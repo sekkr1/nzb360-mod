@@ -23,7 +23,9 @@ jobs:
           name: nzb360.apk
       - run: ls
       - run: pwd
-      - run: apktool d nzb360.apk
+      - run: ls -l
+      - run: cat nzb360.apk
+      - run: apktool d -v nzb360.apk
       - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
       - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
@@ -31,8 +33,8 @@ jobs:
         with:
           name: nzb360_mod.apk
           path: nzb360_mod.apk
-  patch:
-    needs: fetch-apk
+  sign:
+    needs: patch
     runs-on: ubuntu-latest
     container: openjdk
     steps:
