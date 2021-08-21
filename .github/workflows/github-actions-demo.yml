@@ -25,5 +25,23 @@ jobs:
       - run: pwd
       - run: apktool d nzb360.apk
       - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
-      - run: apktool b --use-aapt2 -o nzb360_mod.apk
+      - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nzb360_mod.apk
+          path: nzb360_mod.apk
+  patch:
+    needs: fetch-apk
+    runs-on: ubuntu-latest
+    container: openjdk
+    steps:
+      - run: curl -L https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar >uber-apk-signer.jar
+      - uses: actions/download-artifact@v1
+        with:
+          name: nzb360_mod.apk
+      - run: java -jar uber-apk-signer.jar -a nzb360_mod.apk
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nzb360_mod_signed.apk
+          path: nzb360_mod-aligned-debugSigned.apk
