@@ -49,3 +49,15 @@ jobs:
         with:
           name: nzb360_mod_signed.apk
           path: nzb360_mod-aligned-debugSigned.apk
+  publish:
+    needs: sign
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: nzb360_mod_signed.apk
+          path: .
+      - run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
