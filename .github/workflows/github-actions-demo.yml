@@ -21,6 +21,8 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: nzb360.apk
+      - run: ls
+      - run: pwd
       - run: apktool d nzb360.apk
       - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
       - run: apktool b --use-aapt2 -o nzb360_mod.apk
