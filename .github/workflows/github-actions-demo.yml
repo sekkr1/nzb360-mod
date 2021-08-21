@@ -1,0 +1,17 @@
+name: asd
+on: [push]
+jobs:
+  fetch-apk:
+    runs-on: python
+    steps:
+      - run: git clone https://github.com/jayluxferro/APK-Downloader.git
+      - run: pip install -r APK-Downloader/requirements.txt
+      - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
+      - run: mv *.apk nzb360.apk
+  patch:
+    runs-on: cincan/apktool
+    steps:
+      - run: apktool d nzb360.apk
+      - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
+      - run: apktool b --use-aapt2 -o nzb360_mod.apk
+        working-directory: nzb360
