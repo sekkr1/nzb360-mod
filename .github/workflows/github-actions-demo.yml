@@ -6,7 +6,6 @@ on:
 jobs:
   fetch-apk:
     runs-on: ubuntu-latest
-    container: python
     steps:
       - run: echo curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
         env:
