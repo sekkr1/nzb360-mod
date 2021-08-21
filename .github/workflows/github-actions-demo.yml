@@ -60,7 +60,7 @@ jobs:
         with:
           name: nzb360_mod_signed.apk
           path: .
-      - run: find && env && curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
-        env:
+      - env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: find && env && curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
