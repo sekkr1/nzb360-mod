@@ -27,7 +27,7 @@ jobs:
           name: nzb360.apk
           path: .
       - run: apktool d nzb360.apk
-      - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
+      - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' nzb360) || exit 1; sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
       - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
       - uses: actions/upload-artifact@v1
