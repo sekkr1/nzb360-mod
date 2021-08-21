@@ -14,6 +14,7 @@ jobs:
           name: nzb360.apk
           path: nzb360.apk
   patch:
+    needs: fetch-apk
     runs-on: ubuntu-latest
     container: cincan/apktool
     steps:
