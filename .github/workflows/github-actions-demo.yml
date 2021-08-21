@@ -9,10 +9,17 @@ jobs:
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
       - run: mv *.apk nzb360.apk
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nzb360.apk
+          path: nzb360.apk
   patch:
     runs-on: ubuntu-latest
     container: cincan/apktool
     steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: nzb360.apk
       - run: apktool d nzb360.apk
       - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
       - run: apktool b --use-aapt2 -o nzb360_mod.apk
