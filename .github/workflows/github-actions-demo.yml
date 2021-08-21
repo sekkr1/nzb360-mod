@@ -7,10 +7,6 @@ jobs:
   fetch-apk:
     runs-on: ubuntu-latest
     steps:
-      - run: echo curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
-        env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
@@ -22,8 +18,8 @@ jobs:
   patch:
     needs: fetch-apk
     runs-on: ubuntu-latest
-    container: openjdk
     steps:
+      - uses: actions/setup-java@v2
       - run: curl -LO https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool && chmod +x apktool
         working-directory: /usr/local/bin
       - run: curl -L -o apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.5.0.jar && chmod +x apktool.jar
@@ -43,8 +39,8 @@ jobs:
   sign:
     needs: patch
     runs-on: ubuntu-latest
-    container: openjdk
     steps:
+      - uses: actions/setup-java@v2
       - run: curl -L -o uber-apk-signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar && chmod +x uber-apk-signer.jar
       - uses: actions/download-artifact@v1
         with:
