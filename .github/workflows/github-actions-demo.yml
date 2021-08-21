@@ -2,6 +2,7 @@ name: asd
 on: [push]
 jobs:
   fetch-apk:
+    runs-on: ubuntu-latest
     container: python
     steps:
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
@@ -9,6 +10,7 @@ jobs:
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
       - run: mv *.apk nzb360.apk
   patch:
+    runs-on: ubuntu-latest
     container: cincan/apktool
     steps:
       - run: apktool d nzb360.apk
