@@ -16,7 +16,7 @@ jobs:
   patch:
     needs: fetch-apk
     runs-on: ubuntu-latest
-    container: cincan/apktool
+    container: theanam/apktool
     steps:
       - uses: actions/download-artifact@v1
         with:
