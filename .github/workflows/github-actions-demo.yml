@@ -20,11 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
       - run: curl -LO https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool && chmod +x apktool
         working-directory: /usr/local/bin
       - run: curl -L -o apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.5.0.jar && chmod +x apktool.jar
         working-directory: /usr/local/bin
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: nzb360.apk
           path: .
@@ -32,7 +35,7 @@ jobs:
       - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' nzb360) || exit 1; sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
       - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: nzb360_mod.apk
           path: nzb360_mod.apk
@@ -41,13 +44,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-java@v2
+        with:
+            distribution: 'adopt'
+            java-version: '8'
       - run: curl -L -o uber-apk-signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar && chmod +x uber-apk-signer.jar
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: nzb360_mod.apk
           path: .
       - run: java -jar uber-apk-signer.jar -a nzb360_mod.apk
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: nzb360_mod_signed.apk
           path: nzb360_mod-aligned-debugSigned.apk
@@ -55,7 +61,7 @@ jobs:
     needs: sign
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v2
         with:
           name: nzb360_mod_signed.apk
           path: .
