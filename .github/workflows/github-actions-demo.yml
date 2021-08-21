@@ -16,18 +16,15 @@ jobs:
   patch:
     needs: fetch-apk
     runs-on: ubuntu-latest
-    container: theanam/apktool
+    container: openjdk
     steps:
+      - run: curl -LO https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool && chmod +x apktool
+      - run: curl -L -o apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.5.0.jar && chmod +x apktool.jar
       - uses: actions/download-artifact@v1
         with:
           name: nzb360.apk
           path: .
-      - run: find
-      - run: ls
-      - run: pwd
-      - run: ls -l
-      - run: cat nzb360.apk
-      - run: apktool d -v nzb360.apk
+      - run: apktool d nzb360.apk
       - run: grep -rl 'const-string p1, "valid"' nzb360 | xargs sed -i 's/const-string p1, "valid"/move-object p1, p3/' || (echo bad >&2 && exit 1)
       - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
@@ -40,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openjdk
     steps:
-      - run: curl -L https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar >uber-apk-signer.jar
+      - run: curl -L -o uber-apk-signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar && chmod +x uber-apk-signer.jar
       - uses: actions/download-artifact@v1
         with:
           name: nzb360_mod.apk
