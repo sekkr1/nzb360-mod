@@ -53,10 +53,11 @@ jobs:
           name: nzb360_mod.apk
           path: .
       - run: java -jar uber-apk-signer.jar -a nzb360_mod.apk
+      - run: mv nzb360_mod-aligned-debugSigned.apk nzb360_mod_signed.apk
       - uses: actions/upload-artifact@v2
         with:
           name: nzb360_mod_signed.apk
-          path: nzb360_mod-aligned-debugSigned.apk
+          path: nzb360_mod_signed.apk
   publish:
     needs: sign
     runs-on: ubuntu-latest
@@ -65,7 +66,7 @@ jobs:
         with:
           name: nzb360_mod_signed.apk
           path: .
-      - run: echo curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
+      - run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
