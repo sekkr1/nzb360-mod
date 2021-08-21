@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     container: python
     steps:
-      - env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: echo $TG_CHAT_ID
+      - run: env
+        env:
+            TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+            TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
