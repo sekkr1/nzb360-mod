@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     container: python
     steps:
+      - run: echo curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
@@ -60,7 +64,7 @@ jobs:
         with:
           name: nzb360_mod_signed.apk
           path: .
-      - run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
+      - run: echo curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
