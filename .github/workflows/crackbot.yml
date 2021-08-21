@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 jobs:
-  fetch-apk:
+  fetch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v2
