@@ -43,6 +43,7 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: nzb360_mod.apk
+          path: .
       - run: java -jar uber-apk-signer.jar -a nzb360_mod.apk
       - uses: actions/upload-artifact@v1
         with:
