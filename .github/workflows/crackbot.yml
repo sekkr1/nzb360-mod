@@ -1,4 +1,4 @@
-name: asd
+name: crackbot
 on:
   push:
   schedule:
@@ -7,16 +7,17 @@ jobs:
   fetch-apk:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v2
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
       - run: mv *.apk nzb360.apk
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
           name: nzb360.apk
           path: nzb360.apk
   patch:
-    needs: fetch-apk
+    needs: fetch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-java@v2
@@ -32,7 +33,7 @@ jobs:
           name: nzb360.apk
           path: .
       - run: apktool d nzb360.apk
-      - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' nzb360) || exit 1; sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
+      - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' nzb360) && sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
       - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
         working-directory: nzb360
       - uses: actions/upload-artifact@v2
