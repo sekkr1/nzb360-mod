@@ -12,6 +12,13 @@ jobs:
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
       - run: mv *.apk nzb360.apk
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          key: ${{ hashFiles(nzb360.apk) }}
+      - run: exit 1
+        if: steps.cache.outputs.cache-hit == 'true'
+      - run: cp nzb360.apk nzb360.cached.apk
       - uses: actions/upload-artifact@v2
         with:
           name: nzb360.apk
