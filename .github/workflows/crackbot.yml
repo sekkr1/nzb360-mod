@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/setup-python@v2
       - run: sudo apt-get install -y aapt
-      - run: git clone https://github.com/mixmodapk/APK-Downloader.git
+      - run: git clone https://github.com/sekkr1/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/APK-Downloader.py $PACKAGE
       - run: echo APK_VERSION=$(aapt dump badging $PACKAGE.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
