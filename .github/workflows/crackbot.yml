@@ -2,30 +2,50 @@ name: crackbot
 on:
   push:
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: '0 0 * * *'
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    outputs: 
+      proceed:  ${{ !steps.cache.outputs.cache-hit }}
+      apk_name: $NEW_APKNAME
+    env:
+      APKNAME: nzb360
+      PACKAGE: com.kevinforeman.nzb360
     steps:
       - uses: actions/setup-python@v2
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
-      - run: python APK-Downloader/apk-downloader.py com.kevinforeman.nzb360
-      - run: mv *.apk nzb360.apk
+      - run: python APK-Downloader/apk-downloader.py $PACKAGE
+      - run: apt-get install -y aapt
+      - run: echo APK_VERSION=$(aapt dump badging *.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
+      - run: echo NEW_APKNAME=$APKNAME_$APK_VERSION >> $GITHUB_ENV
+      - run: mv *.apk $NEW_APKNAME.apk
       - uses: actions/cache@v2
         id: cache
         with:
-          path: nzb360.apk
-          key: ${{ hashFiles('nzb360.apk') }}
-      - run: exit 1
-        if: steps.cache.outputs.cache-hit == 'true'
+          path: $NEW_APKNAME.apk
+          key: ${{ hashFiles('*.apk') }}
       - uses: actions/upload-artifact@v2
         with:
-          name: nzb360.apk
-          path: nzb360.apk
+          name: $NEW_APKNAME.apk
+          path: $NEW_APKNAME.apk
+        if: '!steps.cache.outputs.cache-hit'
+      - name: abort if cached
+        run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage -F chat_id=$TG_CHAT_ID -F text="Ive already published $APK_VERSION."$'\nNo new versions for now bro :|'
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        if: steps.cache.outputs.cache-hit	
   patch:
     needs: fetch
     runs-on: ubuntu-latest
+    if: needs.fetch.outputs.proceed
+    outputs:
+      apk_name: $NEW_APKNAME
+    env:
+      APKNAME: ${{needs.fetch.outputs.apk_name}}
+      NEW_APKNAME: $APKNAME_mod
     steps:
       - uses: actions/setup-java@v2
         with:
@@ -37,19 +57,24 @@ jobs:
         working-directory: /usr/local/bin
       - uses: actions/download-artifact@v2
         with:
-          name: nzb360.apk
+          name: $APKNAME.apk
           path: .
-      - run: apktool d nzb360.apk
-      - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' nzb360) && sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
-      - run: apktool b --use-aapt2 -o ../nzb360_mod.apk
-        working-directory: nzb360
+      - run: apktool d $APKNAME.apk
+      - run: TO_PATCH=$(grep -rl 'const-string p1, "valid"' $APKNAME) && sed -i 's/const-string p1, "valid"/move-object p1, p3/' $TO_PATCH
+      - run: apktool b --use-aapt2 -o ../$NEW_APKNAME.apk
+        working-directory: $APKNAME
       - uses: actions/upload-artifact@v2
         with:
-          name: nzb360_mod.apk
-          path: nzb360_mod.apk
+          name: $NEW_APKNAME.apk
+          path: $NEW_APKNAME.apk
   sign:
     needs: patch
     runs-on: ubuntu-latest
+    outputs:
+      apk_name: $NEW_APKNAME
+    env:
+      APKNAME: ${{needs.patch.outputs.apk_name}}
+      NEW_APKNAME: $APKNAME_signed
     steps:
       - uses: actions/setup-java@v2
         with:
@@ -58,23 +83,25 @@ jobs:
       - run: curl -L -o uber-apk-signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.2.1/uber-apk-signer-1.2.1.jar && chmod +x uber-apk-signer.jar
       - uses: actions/download-artifact@v2
         with:
-          name: nzb360_mod.apk
+          name: $APKNAME.apk
           path: .
-      - run: java -jar uber-apk-signer.jar -a nzb360_mod.apk
-      - run: mv nzb360_mod-aligned-debugSigned.apk nzb360_mod_signed.apk
+      - run: java -jar uber-apk-signer.jar -a $APKNAME.apk
+      - run: mv nzb360_mod-aligned-debugSigned.apk $NEW_APKNAME.apk
       - uses: actions/upload-artifact@v2
         with:
-          name: nzb360_mod_signed.apk
-          path: nzb360_mod_signed.apk
+          name: $NEW_APKNAME.apk
+          path: $NEW_APKNAME.apk
   publish:
     needs: sign
     runs-on: ubuntu-latest
+    env:
+      APKNAME: ${{needs.sign.outputs.apk_name}}
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: nzb360_mod_signed.apk
+          name: $APKNAME.apk
           path: .
-      - run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@nzb360_mod_signed.apk
+      - run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument -F chat_id=$TG_CHAT_ID -F document=@$APKNAME.apk
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
