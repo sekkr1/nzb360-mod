@@ -20,16 +20,16 @@ jobs:
       - run: python APK-Downloader/APK-Downloader.py $PACKAGE
       - run: echo APK_VERSION=$(aapt dump badging $PACKAGE.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
       - run: echo NEW_APKNAME=${APKNAME}_${APK_VERSION} >> $GITHUB_ENV
-      - run: touch cache_placeholder
+      - run: mv $PACKAGE.apk $NEW_APKNAME.apk
       - uses: actions/cache@v2
         id: cache
         with:
-          path: cache_placeholder
+          path: ${{env.NEW_APKNAME}}.apk
           key: ${{ hashFiles('*.apk') }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{env.NEW_APKNAME}}.apk
-          path: ${{env.PACKAGE}}.apk
+          path: ${{env.NEW_APKNAME}}.apk
         if: '!steps.cache.outputs.cache-hit'
       - name: abort if cached
         run: curl https://api.telegram.org/bot$TG_BOT_TOKEN/sendMessage -F chat_id=$TG_CHAT_ID -F text="Ive already published $APK_VERSION."$'\nNo new versions for now bro :|'
