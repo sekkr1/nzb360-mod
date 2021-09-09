@@ -14,13 +14,13 @@ jobs:
       PACKAGE: com.kevinforeman.nzb360
     steps:
       - uses: actions/setup-python@v2
-      - run: git clone https://github.com/jayluxferro/APK-Downloader.git
+      - run: sudo apt-get install -y aapt
+      - run: git clone https://github.com/mixmodapk/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py $PACKAGE
-      - run: sudo apt-get install -y aapt
-      - run: echo APK_VERSION=$(aapt dump badging *.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
+      - run: echo APK_VERSION=$(aapt dump badging $PACKAGE.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
       - run: echo NEW_APKNAME=$APKNAME_$APK_VERSION >> $GITHUB_ENV
-      - run: mv *.apk $NEW_APKNAME.apk
+      - run: mv $PACKAGE.apk $NEW_APKNAME.apk
       - uses: actions/cache@v2
         id: cache
         with:
