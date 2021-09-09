@@ -25,7 +25,7 @@ jobs:
         id: cache
         with:
           path: ${{env.NEW_APKNAME}}.apk
-          key: a_${{ hashFiles('*.apk') }}
+          key: ${{ hashFiles('*.apk') }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{env.NEW_APKNAME}}.apk
@@ -45,8 +45,8 @@ jobs:
       apk_name: ${{env.NEW_APKNAME}}
     env:
       APKNAME: ${{needs.fetch.outputs.apk_name}}
-      NEW_APKNAME: ${{needs.fetch.outputs.apk_name}}_mod
     steps:
+      - run: echo NEW_APKNAME=${APKNAME}_mod >> $GITHUB_ENV
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
@@ -74,8 +74,8 @@ jobs:
       apk_name: ${{env.NEW_APKNAME}}
     env:
       APKNAME: ${{needs.patch.outputs.apk_name}}
-      NEW_APKNAME: ${{needs.patch.outputs.apk_name}}_signed
     steps:
+      - run: echo NEW_APKNAME=${APKNAME}_signed >> $GITHUB_ENV
       - uses: actions/setup-java@v2
         with:
             distribution: 'adopt'
