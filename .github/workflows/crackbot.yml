@@ -17,7 +17,7 @@ jobs:
       - run: git clone https://github.com/jayluxferro/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
       - run: python APK-Downloader/apk-downloader.py $PACKAGE
-      - run: apt-get install -y aapt
+      - run: sudo apt-get install -y aapt
       - run: echo APK_VERSION=$(aapt dump badging *.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
       - run: echo NEW_APKNAME=$APKNAME_$APK_VERSION >> $GITHUB_ENV
       - run: mv *.apk $NEW_APKNAME.apk
