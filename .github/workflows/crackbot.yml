@@ -17,7 +17,7 @@ jobs:
       - run: sudo apt-get install -y aapt
       - run: git clone https://github.com/mixmodapk/APK-Downloader.git
       - run: pip install -r APK-Downloader/requirements.txt
-      - run: python APK-Downloader/apk-downloader.py $PACKAGE
+      - run: python APK-Downloader/APK-Downloader.py $PACKAGE
       - run: echo APK_VERSION=$(aapt dump badging $PACKAGE.apk | grep "versionName" | sed -e "s/.*versionName='//" -e "s/' .*//") >> $GITHUB_ENV
       - run: echo NEW_APKNAME=$APKNAME_$APK_VERSION >> $GITHUB_ENV
       - run: mv $PACKAGE.apk $NEW_APKNAME.apk
