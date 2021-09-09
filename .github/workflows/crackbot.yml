@@ -86,7 +86,7 @@ jobs:
           name: ${{env.APKNAME}}.apk
           path: .
       - run: java -jar uber-apk-signer.jar -a $APKNAME.apk
-      - run: mv nzb360_mod-aligned-debugSigned.apk $NEW_APKNAME.apk
+      - run: mv $APKNAME-aligned-debugSigned.apk $NEW_APKNAME.apk
       - uses: actions/upload-artifact@v2
         with:
           name: ${{env.NEW_APKNAME}}.apk
