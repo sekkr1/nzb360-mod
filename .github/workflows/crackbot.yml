@@ -45,7 +45,7 @@ jobs:
       apk_name: ${{env.NEW_APKNAME}}
     env:
       APKNAME: ${{needs.fetch.outputs.apk_name}}
-      NEW_APKNAME: ${{env.APKNAME}}_mod
+      NEW_APKNAME: ${{needs.fetch.outputs.apk_name}}_mod
     steps:
       - uses: actions/setup-java@v2
         with:
@@ -74,7 +74,7 @@ jobs:
       apk_name: ${{env.NEW_APKNAME}}
     env:
       APKNAME: ${{needs.patch.outputs.apk_name}}
-      NEW_APKNAME: ${{env.APKNAME}}_signed
+      NEW_APKNAME: ${{needs.patch.outputs.apk_name}}_signed
     steps:
       - uses: actions/setup-java@v2
         with:
